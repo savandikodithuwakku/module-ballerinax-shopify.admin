@@ -109,9 +109,10 @@ isolated class ShopifyOAuthHandler {
             );
 
             if response.statusCode != 200 && response.statusCode != 201 {
-                string errBody = check response.getTextPayload();
+                string|error errBody = response.getTextPayload();
+                string errMessage = errBody is string ? errBody : "unknown error";
                 return error("Shopify token fetch failed. HTTP "
-                    + response.statusCode.toString() + ": " + errBody);
+                    + response.statusCode.toString() + ": " + errMessage);
             }
 
             json responseJson = check response.getJsonPayload();
