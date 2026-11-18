@@ -41,7 +41,7 @@ function testClientCredentialsConfigValues() {
     groups: ["mock_tests", "oauth_tests"]
 }
 function testOAuthHandlerFetchesToken() returns error? {
-    ShopifyOAuthHandler handler = new (
+    ShopifyOAuthHandler handler = check new (
         "mock-client-id",
         "mock-client-secret",
         "read_products",
@@ -55,7 +55,7 @@ function testOAuthHandlerFetchesToken() returns error? {
     groups: ["mock_tests", "oauth_tests"]
 }
 function testTokenIsCached() returns error? {
-    ShopifyOAuthHandler handler = new (
+    ShopifyOAuthHandler handler = check new (
         "mock-client-id",
         "mock-client-secret",
         "read_products",

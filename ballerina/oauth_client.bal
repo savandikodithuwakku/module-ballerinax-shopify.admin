@@ -41,7 +41,7 @@ public isolated client class ShopifyAdminClient {
     # + return - An error if the initial token fetch fails
     public isolated function init(ClientCredentialsConfig credConfig,
             string serviceUrl) returns error? {
-        self.oauthHandler = new ShopifyOAuthHandler(
+        self.oauthHandler = check new ShopifyOAuthHandler(
             credConfig.clientId,
             credConfig.clientSecret,
             credConfig.scope,

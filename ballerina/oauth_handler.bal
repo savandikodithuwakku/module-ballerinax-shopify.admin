@@ -33,15 +33,18 @@ isolated class ShopifyOAuthHandler {
     private final string clientId;
     private final string clientSecret;
     private final string scope;
-    private final string serviceUrl;
+    private final http:Client tokenClient;
     private TokenCache? cachedToken = ();
 
     public isolated function init(string clientId, string clientSecret,
-            string scope, string serviceUrl) {
+            string scope, string serviceUrl) returns error? {
         self.clientId = clientId;
         self.clientSecret = clientSecret;
         self.scope = scope;
-        self.serviceUrl = serviceUrl;
+        self.tokenClient = check new (
+            serviceUrl,
+            {timeout: 30}
+        );
     }
 
     # Returns a valid access token, fetching a new one from Shopify if the
@@ -68,10 +71,6 @@ isolated class ShopifyOAuthHandler {
             string cId = self.clientId;
             string cSecret = self.clientSecret;
             string cScope = self.scope;
-            http:Client tokenClient = check new (
-                self.serviceUrl,
-                {timeout: 30}
-            );
 
             string encodedClientId = check url:encode(cId, "UTF-8");
             string encodedClientSecret = check url:encode(cSecret, "UTF-8");
@@ -82,7 +81,7 @@ isolated class ShopifyOAuthHandler {
                 + "&grant_type=client_credentials"
                 + "&scope=" + encodedScope;
 
-            http:Response response = check tokenClient->post(
+            http:Response response = check self.tokenClient->post(
                 "/admin/oauth/access_token",
                 requestBody,
                 headers = {"Content-Type": "application/x-www-form-urlencoded"}
