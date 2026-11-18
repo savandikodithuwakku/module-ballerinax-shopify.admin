@@ -142,6 +142,52 @@ Use the following command to compile and run the Ballerina program.
 bal run
 ```
 
+## OAuth client credentials
+
+Use `ShopifyAdminClient` when the application should authenticate with Shopify using the client ID and client secret from an OAuth app. `serviceUrl` must be the complete store URL, including the scheme.
+
+```ballerina
+import ballerinax/shopify.admin as shopadmin;
+
+configurable string clientId = ?;
+configurable string clientSecret = ?;
+configurable string scope = "read_products,read_orders";
+configurable string serviceUrl = "https://your-store.myshopify.com";
+
+public function main() returns error? {
+    shopadmin:ShopifyAdminClient wrapper = check new (
+        {
+            clientId,
+            clientSecret,
+            scope
+        },
+        serviceUrl
+    );
+
+    shopadmin:Client shopify = check wrapper.getClient();
+    shopadmin:ProductsResponse products =
+        check shopify->retrieveAListOfProducts();
+}
+```
+
+The optional `ConnectionConfig` parameter can be used to configure HTTP behavior such as timeout, TLS, proxy, and retry settings:
+
+```ballerina
+shopadmin:ConnectionConfig connectionConfig = {
+    timeout: 60
+};
+
+shopadmin:ShopifyAdminClient wrapper = check new (
+    {
+        clientId,
+        clientSecret,
+        scope
+    },
+    serviceUrl,
+    connectionConfig
+);
+```
+
 ## Examples
 
 The `ballerinax/shopify.admin` connector provides practical examples illustrating usage in various scenarios.
