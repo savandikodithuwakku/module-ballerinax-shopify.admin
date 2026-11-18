@@ -377,4 +377,11 @@ service /shopify on new http:Listener(8080) {
             return {count: tokenRequestCount};
         }
     }
+
+    resource function delete admin/oauth/token_request_count() returns json {
+        lock {
+            tokenRequestCount = 0;
+            return {message: "Counter reset"};
+        }
+    }
 }
