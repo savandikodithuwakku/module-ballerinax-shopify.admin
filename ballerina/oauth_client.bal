@@ -20,11 +20,10 @@ public type ClientCredentialsConfig record {|
     # The Client ID of your Shopify app
     string clientId;
     # The Client Secret of your Shopify app
+    @display {label: "", kind: "password"}
     string clientSecret;
     # Comma-separated list of access scopes e.g. "read_orders,read_products"
     string scope;
-    # Your shop's myshopify.com domain e.g. "my-store.myshopify.com"
-    string shopDomain;
 |};
 
 # A client wrapper that supports OAuth 2.0 client credentials authentication.
@@ -46,7 +45,7 @@ public isolated client class ShopifyAdminClient {
             credConfig.clientId,
             credConfig.clientSecret,
             credConfig.scope,
-            credConfig.shopDomain
+            serviceUrl
         );
         self.serviceUrl = serviceUrl;
         _ = check self.oauthHandler.getToken();

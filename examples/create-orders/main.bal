@@ -21,15 +21,13 @@ configurable string serviceUrl = ?;
 configurable string clientId = ?;
 configurable string clientSecret = ?;
 configurable string scope = ?;
-configurable string shopDomain = ?;
 
 public function main() returns error? {
     shopadmin:ShopifyAdminClient shopifyWrapper = check new (
         {
             clientId: clientId,
             clientSecret: clientSecret,
-            scope: scope,
-            shopDomain: shopDomain
+            scope: scope
         },
         serviceUrl
     );

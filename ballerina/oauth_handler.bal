@@ -33,15 +33,15 @@ isolated class ShopifyOAuthHandler {
     private final string clientId;
     private final string clientSecret;
     private final string scope;
-    private final string shopDomain;
+    private final string serviceUrl;
     private TokenCache? cachedToken = ();
 
     public isolated function init(string clientId, string clientSecret,
-            string scope, string shopDomain) {
+            string scope, string serviceUrl) {
         self.clientId = clientId;
         self.clientSecret = clientSecret;
         self.scope = scope;
-        self.shopDomain = shopDomain;
+        self.serviceUrl = serviceUrl;
     }
 
     # Returns a valid access token, fetching a new one from Shopify if the
@@ -68,11 +68,8 @@ isolated class ShopifyOAuthHandler {
             string cId = self.clientId;
             string cSecret = self.clientSecret;
             string cScope = self.scope;
-            string cDomain = self.shopDomain;
-
-            string scheme = cDomain.startsWith("localhost") ? "http" : "https";
             http:Client tokenClient = check new (
-                string `${scheme}://${cDomain}`,
+                self.serviceUrl,
                 {timeout: 30}
             );
 

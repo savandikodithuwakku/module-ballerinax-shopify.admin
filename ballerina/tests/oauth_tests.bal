@@ -18,7 +18,6 @@ import ballerina/test;
 import ballerina/http;
 
 final string mockServiceUrl = "http://localhost:8080/shopify";
-final string mockShopDomain = "localhost:8080/shopify";
 
 @test:Config {
     groups: ["mock_tests", "oauth_tests"]
@@ -27,8 +26,7 @@ function testClientCredentialsConfigValues() {
     ClientCredentialsConfig config = {
         clientId: "test-client-id",
         clientSecret: "test-client-secret",
-        scope: "read_products,read_orders",
-        shopDomain: "test-store.myshopify.com"
+        scope: "read_products,read_orders"
     };
 
     test:assertEquals(config.clientId, "test-client-id",
@@ -37,8 +35,6 @@ function testClientCredentialsConfigValues() {
         "clientSecret should be stored correctly");
     test:assertEquals(config.scope, "read_products,read_orders",
         "scope should be stored correctly");
-    test:assertEquals(config.shopDomain, "test-store.myshopify.com",
-        "shopDomain should be stored correctly");
 }
 
 @test:Config {
@@ -49,7 +45,7 @@ function testOAuthHandlerFetchesToken() returns error? {
         "mock-client-id",
         "mock-client-secret",
         "read_products",
-        mockShopDomain
+        mockServiceUrl
     );
     string token = check handler.getToken();
     test:assertTrue(token.length() > 0, "Token should not be empty");
@@ -63,7 +59,7 @@ function testTokenIsCached() returns error? {
         "mock-client-id",
         "mock-client-secret",
         "read_products",
-        mockShopDomain
+        mockServiceUrl
     );
 
     // First call fetches token from mock server
@@ -96,8 +92,7 @@ function testShopifyAdminClientInit() returns error? {
         {
             clientId: "mock-client-id",
             clientSecret: "mock-client-secret",
-            scope: "read_products",
-            shopDomain: mockShopDomain
+            scope: "read_products"
         },
         mockServiceUrl
     );
@@ -112,8 +107,7 @@ function testGetClientReturnsWorkingClient() returns error? {
         {
             clientId: "mock-client-id",
             clientSecret: "mock-client-secret",
-            scope: "read_products",
-            shopDomain: mockShopDomain
+            scope: "read_products"
         },
         mockServiceUrl
     );
