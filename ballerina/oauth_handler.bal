@@ -84,9 +84,9 @@ isolated class ShopifyOAuthHandler {
                         + remaining.toString() + "s");
                     return current.accessToken;
                 }
-                log:printInfo("Shopify token expired. Fetching a new token...");
+                log:printDebug("Shopify token expired. Fetching a new token...");
             } else {
-                log:printInfo("No token yet. Fetching initial token from Shopify...");
+                log:printDebug("No token yet. Fetching initial token from Shopify...");
             }
 
             string cId = self.clientId;
@@ -131,7 +131,7 @@ isolated class ShopifyOAuthHandler {
                 expiresInSeconds: expiresIn
             };
 
-            log:printInfo("New Shopify token fetched. Valid for "
+            log:printDebug("New Shopify token fetched. Valid for "
                 + expiresIn.toString() + "s");
             return newToken;
         }
