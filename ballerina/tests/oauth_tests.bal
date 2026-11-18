@@ -22,24 +22,6 @@ final string mockServiceUrl = "http://localhost:8080/shopify";
 @test:Config {
     groups: ["mock_tests", "oauth_tests"]
 }
-function testClientCredentialsConfigValues() {
-    ClientCredentialsConfig config = {
-        clientId: "test-client-id",
-        clientSecret: "test-client-secret",
-        scope: "read_products,read_orders"
-    };
-
-    test:assertEquals(config.clientId, "test-client-id",
-        "clientId should be stored correctly");
-    test:assertEquals(config.clientSecret, "test-client-secret",
-        "clientSecret should be stored correctly");
-    test:assertEquals(config.scope, "read_products,read_orders",
-        "scope should be stored correctly");
-}
-
-@test:Config {
-    groups: ["mock_tests", "oauth_tests"]
-}
 function testOAuthHandlerFetchesToken() returns error? {
     ShopifyOAuthHandler handler = check new (
         "mock-client-id",
@@ -62,41 +44,20 @@ function testTokenIsCached() returns error? {
         mockServiceUrl
     );
 
+    http:Client mockClient = check new ("http://localhost:8080/shopify");
+    json beforeResponse = check mockClient->get("/admin/oauth/token_request_count");
+    int countBefore = check beforeResponse.count;
+
     // First call fetches token from mock server
     string token1 = check handler.getToken();
-    test:assertEquals(token1, "mock-access-token-12345",
-        "First call should return the mock token");
-
-    // Second call should use cached token — not make another server request.
-    // Since the mock returns a token valid for 86400s, the cache will be used.
     string token2 = check handler.getToken();
-    test:assertEquals(token2, "mock-access-token-12345",
-        "Cached call should return the same mock token");
+    json afterResponse = check mockClient->get("/admin/oauth/token_request_count");
+    int countAfter = check afterResponse.count;
 
-    // Verify both calls returned identical values
     test:assertEquals(token1, token2,
         "Token should be served from cache on second call");
-
-    // Verify only one network request was made by checking counter
-    http:Client mockClient = check new ("http://localhost:8080/shopify");
-    json countResponse = check mockClient->get("/admin/oauth/token_request_count");
-    int count = check countResponse.count;
-    test:assertTrue(count >= 1, "Token endpoint should have been called at least once");
-}
-
-@test:Config {
-    groups: ["mock_tests", "oauth_tests"]
-}
-function testShopifyAdminClientInit() returns error? {
-    ShopifyAdminClient _ = check new (
-        {
-            clientId: "mock-client-id",
-            clientSecret: "mock-client-secret",
-            scope: "read_products"
-        },
-        mockServiceUrl
-    );
-    test:assertTrue(true, "ShopifyAdminClient initialized successfully");
+    test:assertEquals(countAfter - countBefore, 1,
+        "Only one network request should be made - second call uses cache");
 }
 
 @test:Config {
