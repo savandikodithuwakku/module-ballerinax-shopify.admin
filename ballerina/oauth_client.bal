@@ -33,6 +33,8 @@ public isolated client class ShopifyAdminClient {
 
     private final ShopifyOAuthHandler oauthHandler;
     private final string serviceUrl;
+    private string cachedToken = "";
+    private Client? cachedClient = ();
 
     # Initializes the client and validates credentials by fetching an initial token.
     #
@@ -59,9 +61,19 @@ public isolated client class ShopifyAdminClient {
     # + return - A configured `Client` or an error if token refresh fails
     public isolated function getClient() returns Client|error {
         string token = check self.oauthHandler.getToken();
-        return check new Client(
-            apiKeyConfig = {xShopifyAccessToken: token},
-            serviceUrl = self.serviceUrl
-        );
+        lock {
+            if token != self.cachedToken || self.cachedClient is () {
+                self.cachedToken = token;
+                self.cachedClient = check new Client(
+                    apiKeyConfig = {xShopifyAccessToken: token},
+                    serviceUrl = self.serviceUrl
+                );
+            }
+            Client? cachedClient = self.cachedClient;
+            if cachedClient is Client {
+                return cachedClient;
+            }
+            return error("Shopify client was not initialized");
+        }
     }
 }
