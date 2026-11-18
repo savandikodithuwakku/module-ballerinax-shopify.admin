@@ -37,13 +37,34 @@ isolated class ShopifyOAuthHandler {
     private TokenCache? cachedToken = ();
 
     public isolated function init(string clientId, string clientSecret,
-            string scope, string serviceUrl) returns error? {
+            string scope, string serviceUrl, ConnectionConfig config = {})
+            returns error? {
         self.clientId = clientId;
         self.clientSecret = clientSecret;
         self.scope = scope;
+        http:ClientConfiguration httpClientConfig = {
+            httpVersion: config.httpVersion,
+            http1Settings: config.http1Settings,
+            http2Settings: config.http2Settings,
+            timeout: config.timeout,
+            forwarded: config.forwarded,
+            followRedirects: config.followRedirects,
+            poolConfig: config.poolConfig,
+            cache: config.cache,
+            compression: config.compression,
+            circuitBreaker: config.circuitBreaker,
+            retryConfig: config.retryConfig,
+            cookieConfig: config.cookieConfig,
+            responseLimits: config.responseLimits,
+            secureSocket: config.secureSocket,
+            proxy: config.proxy,
+            socketConfig: config.socketConfig,
+            validation: config.validation,
+            laxDataBinding: config.laxDataBinding
+        };
         self.tokenClient = check new (
             serviceUrl,
-            {timeout: 30}
+            httpClientConfig
         );
     }
 

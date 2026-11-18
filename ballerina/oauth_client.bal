@@ -38,14 +38,16 @@ public isolated client class ShopifyAdminClient {
     #
     # + credConfig - OAuth 2.0 credentials from the Shopify Partner Dashboard
     # + serviceUrl - Base URL of the Shopify store e.g. "https://my-store.myshopify.com"
+    # + config - Connection settings for the OAuth client
     # + return - An error if the initial token fetch fails
     public isolated function init(ClientCredentialsConfig credConfig,
-            string serviceUrl) returns error? {
+            string serviceUrl, ConnectionConfig config = {}) returns error? {
         self.oauthHandler = check new ShopifyOAuthHandler(
             credConfig.clientId,
             credConfig.clientSecret,
             credConfig.scope,
-            serviceUrl
+            serviceUrl,
+            config
         );
         self.serviceUrl = serviceUrl;
         _ = check self.oauthHandler.getToken();
