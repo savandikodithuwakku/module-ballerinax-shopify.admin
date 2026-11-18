@@ -34,9 +34,28 @@ public function main() returns error? {
 
     shopadmin:Client shopify = check shopifyWrapper.getClient();
 
-    shopadmin:ProductsResponse products = check shopify->retrieveAListOfProducts();
-    io:println("Products in store: ", products.products);
+    shopadmin:CustomerResponse response = check shopify->createACustomer({
+        customer: {
+            firstName: "John",
+            lastName: "Doe",
+            email: "john.doe@example.com"
+        }
+    });
 
-    shopadmin:ShopConfigurations shopInfo = check shopify->retrieveTheShopSConfiguration();
-    io:println("Shop name: ", shopInfo.shop?.name);
+    shopadmin:OrderResponse newOrder = check shopify->createAnOrder({
+        'order: {
+            customer: {
+                id: response.customer?.id
+            },
+            lineItems: [
+                {
+                    title: "Custom Item",
+                    price: "10.00",
+                    quantity: 1
+                }
+            ]
+        }
+    });
+
+    io:println("New order created: ", newOrder.'order);
 }
