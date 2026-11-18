@@ -120,8 +120,8 @@ isolated class ShopifyOAuthHandler {
 
             int expiresIn = 86400;
             json|error expiresField = responseJson.expires_in;
-            if expiresField is json && expiresField != () {
-                expiresIn = check int:fromString(expiresField.toString());
+            if expiresField is int {
+                expiresIn = expiresField;
             }
 
             time:Utc fetchedAt = time:utcNow();
