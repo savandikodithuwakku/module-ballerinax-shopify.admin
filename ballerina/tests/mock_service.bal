@@ -341,9 +341,28 @@ service /shopify on new http:Listener(8080) {
     }
     // Mock OAuth token endpoint
     resource function post admin/oauth/access_token(
-            @http:Payload string payload) returns json {
+            @http:Payload string payload) returns http:Response|json {
         lock {
             tokenRequestCount += 1;
+        }
+        if payload.startsWith("client_id=unauthorized-client") {
+            http:Response response = new;
+            response.statusCode = 401;
+            response.setPayload("Unauthorized", "text/plain");
+            return response;
+        }
+        if payload.startsWith("client_id=missing-expires") {
+            return {
+                access_token: "mock-access-token-no-expiry",
+                scope: "read_products"
+            };
+        }
+        if payload.startsWith("client_id=short-expiry") {
+            return {
+                access_token: "mock-access-token-short-expiry",
+                scope: "read_products",
+                expires_in: 200
+            };
         }
         return {
             access_token: "mock-access-token-12345",
