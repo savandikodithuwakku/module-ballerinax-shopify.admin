@@ -37,7 +37,7 @@ isolated class ShopifyOAuthHandler {
     private TokenCache? cachedToken = ();
 
     public isolated function init(string clientId, string clientSecret,
-            string scope, string serviceUrl, ConnectionConfig config = {})
+            string scope, string serviceUrl, readonly & ConnectionConfig config = {})
             returns error? {
         self.clientId = clientId;
         self.clientSecret = clientSecret;

@@ -145,6 +145,7 @@ bal run
 ## OAuth client credentials
 
 Use `ShopifyAdminClient` when the application should authenticate with Shopify using the client ID and client secret from an OAuth app. `serviceUrl` must be the complete store URL, including the scheme.
+Static access-token authentication remains supported through the existing `Client` constructor.
 
 ```ballerina
 import ballerinax/shopify.admin as shopadmin;
@@ -173,7 +174,7 @@ public function main() returns error? {
 The optional `ConnectionConfig` parameter can be used to configure HTTP behavior such as timeout, TLS, proxy, and retry settings:
 
 ```ballerina
-shopadmin:ConnectionConfig connectionConfig = {
+final readonly & shopadmin:ConnectionConfig connectionConfig = {
     timeout: 60
 };
 
